@@ -42,29 +42,28 @@ def main():
                 running = False
             # trình xử lý chuột
             elif e.type == p.MOUSEBUTTONDOWN:
-                if not gameOver:
-                    if humanTurn:
-                        location = p.mouse.get_pos()  # (x, y) vị trí chuột
-                        col = location[0]//SQ_SIZE
-                        row = location[1]//SQ_SIZE
-                        if sqSelected == (row, col):  # người dùng đã nhấp vào cùng một hình vuông hai lần
-                            sqSelected = ()  # bỏ chọn
-                            playerClicks = []  # xóa số lần nhấp chuột của người chơi
-                        else:
-                            sqSelected = (row, col)
-                            playerClicks.append(sqSelected)  # nối thêm cho cả lần nhấp thứ 1 và thứ 2
-                        if len(playerClicks) == 2:  # sau lần nhấp thứ 2
-                            move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
-                            print(move.getChessNotation())
-                            for i in range(len(validMovies)):
-                                if move == validMovies[i]:
-                                    gs.makeMove(move)
-                                    moveMade = True
-                                    animate = True
-                                    sqSelected = () #đặt lại số lần nhấp chuột của người dùng
-                                    playerClicks = []
-                            if not moveMade:
-                                playerClicks = [sqSelected]
+                if not gameOver and humanTurn:
+                    location = p.mouse.get_pos()  # (x, y) vị trí chuột
+                    col = location[0]//SQ_SIZE
+                    row = location[1]//SQ_SIZE
+                    if sqSelected == (row, col):  # người dùng đã nhấp vào cùng một hình vuông hai lần
+                        sqSelected = ()  # bỏ chọn
+                        playerClicks = []  # xóa số lần nhấp chuột của người chơi
+                    else:
+                        sqSelected = (row, col)
+                        playerClicks.append(sqSelected)  # nối thêm cho cả lần nhấp thứ 1 và thứ 2
+                    if len(playerClicks) == 2:  # sau lần nhấp thứ 2
+                        move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
+                        print(move.getChessNotation())
+                        for i in range(len(validMovies)):
+                            if move == validMovies[i]:
+                                gs.makeMove(move)
+                                moveMade = True
+                                animate = True
+                                sqSelected = () #đặt lại số lần nhấp chuột của người dùng
+                                playerClicks = []
+                        if not moveMade:
+                            playerClicks = [sqSelected]
 
             # sử lý key
             elif e.type == p.KEYDOWN:
@@ -81,12 +80,13 @@ def main():
                     animate = False
 
         # AI move finder
-        if not humanTurn:
+        if not gameOver and not humanTurn:
             AImove = SmartMoveFinder.findBestMove(gs, validMovies)
             if AImove is None:
                 AImove = SmartMoveFinder.findRandomMove(validMovies)
             gs.makeMove(AImove)
             moveMade = True
+            animate = True
 
         if moveMade:
             if animate:
